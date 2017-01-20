@@ -8,6 +8,7 @@
 SVN_DIR=/home/svn_home
 LOG_FILE=install_svn.log
 
+declare sys_info=""
 
 # 执行状态log
 log_to_file()
@@ -44,8 +45,7 @@ get_sys_version()
     sys_name=`cat /etc/*-release | awk -F"^NAME=" '{print $2}'`
     sys_version=`cat /etc/*-release | awk -F"^VERSION=" '{print $2}'`
 
-    echo $sys_name
-    echo $sys_version
+    sys_info=$sys_name" "$sys_version
 }
 
 # yum安装svn
@@ -53,6 +53,12 @@ install_svn()
 {
     cur_module="yum_install_svn"
     log_to_file "[*] ${cur_module}"
+
+    check_system=`echo $sys_info | grep -p "[Cc]ent[Oo][Ss]"` >/dev/null
+    if [ $? -ne 0];then
+        echo "sys version error!"
+	exit -1
+    fi
 
     yum install -y subversion
     svnserve --version > /dev/null
@@ -160,14 +166,12 @@ setup_iptables()
 usage()
 {
     echo "Usage: $0 "
-    echo "\t install svn server at Centos"
+    echo " install svn server at Centos"
 }
 
 
-
-if [ $# -ne 2 ];then
-    usage
-else
+main()
+{
     if [ $UID -ne 0 ];then
         echo "You most run $0 with root, exit!"
         exit -1
@@ -181,5 +185,7 @@ else
     start_svn_service
     add_authrun
     setup_iptables
-fi
+}
+
+main
 
