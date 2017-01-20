@@ -8,7 +8,7 @@
 SVN_DIR=/home/svn_home
 LOG_FILE=install_svn.log
 
-declare sys_info=""
+declare sys_info
 
 # 执行状态log
 log_to_file()
